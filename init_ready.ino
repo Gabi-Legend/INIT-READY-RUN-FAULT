@@ -1,4 +1,4 @@
-int touch_sensor = 8;
+int touch_sensor = 2;
 
 enum State {
   INIT,
@@ -6,37 +6,29 @@ enum State {
   RUN,
   FAULT
 };
-
 State currentState = INIT;
-
+bool initPrinted = false;
+bool readyPrinted = false;
 void setup() {
   pinMode(touch_sensor, INPUT);
   Serial.begin(9600);
 }
-
 void loop() {
-  bool val = digitalRead(touch_sensor);
-  switch (currentState) {
-    case INIT:
+  int val = digitalRead(touch_sensor);
+  if (currentState == INIT) {
+    if (!initPrinted) {
       Serial.println("INIT STATE");
-      if(touch_sensor == HIGH){
-        currentState = READY;
-      }else{
-        currentState = FAULT;
-      }
-      delay(500);
-      break;
-    case READY:
+      initPrinted = true;
+    }
+    currentState = READY;
+  }
+  if (currentState == READY) {
+    if (!readyPrinted) {
       Serial.println("READY STATE");
-      delay(500)
-      break;
-    case RUN:
-      Serial.println("RUN STATE");
-      delay(500)
-      break;
-    case FAULT:
-      Serial.println("FAULT STATE");
-      delay(500)
-      break;
+      readyPrinted = true;
+    }
+    if (val == HIGH) {
+      currentState = RUN;
+    }
   }
 }
